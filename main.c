@@ -116,14 +116,13 @@ void loop1(unsigned char **pointer, FILE *stream, Stack *stack) {
     if (**pointer == 0) {
         int c, depth = 1;
         do {
-
-            c = fgetc(stream);
+            c = fgetc(stream);                     // make sure we exit on the right depth, this will avoid nested loops from quitting when seeing the first ]
             if (c == '[') depth++;
             if (c == ']') depth--;
 
-        } while (c != EOF && depth > 0);
+        } while (c != EOF && depth > 0);               // make sure that we have resolved every []
     } else {
-        stack_push(*stack, ftell(stream));
+        stack_push(*stack, ftell(stream));      // push to the stack as we might need to return here after the loop body executes
     }
 
 
@@ -131,16 +130,13 @@ void loop1(unsigned char **pointer, FILE *stream, Stack *stack) {
 
 void loop2(unsigned char **pointer, FILE *stream, Stack *stack) {
     if (**pointer != 0) {
-        if (!is_stack_empty(stack)) {
-            unsigned long long top = stack_top(*stack); // safe peek
+        if (!is_stack_empty(stack)) {         // check if the stack is empty and if not then seek out the loop 
+            unsigned long long top = stack_top(*stack); // safe 
             fseek(stream, top, SEEK_SET);
-        } else {
-            // cell != 0 but stack empty? just continue
         }
     } else {
-        if (!is_stack_empty(*stack)) {
-            unsigned long long dummy;
-            stack_pop(stack, &dummy);
+        if (!is_stack_empty(*stack)) {      // again check if the stack is empty, this time pop because we are leaving the loop
+            stack_pop(stack, NULL);    // ignore the pop value as we do not need it this time
         }
     }
 }
