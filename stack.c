@@ -8,7 +8,7 @@ struct stack;
 
 typedef struct stack_item {
     struct stack_item *below;
-    int data;
+    unsigned long long data;
 } StackItem;
 
 typedef struct stack {
@@ -30,8 +30,7 @@ Stack create_stack() {
 }
 
 void destroy_stack(Stack hStack) {
-    STACK *pStack = (STACK *)hStack;
-    int a; //throw away variable to store the popping
+    unsigned long long a; //throw away variable to store the popping
 
     while (!is_stack_empty(hStack)) {
         stack_pop(hStack, &a);
@@ -42,7 +41,7 @@ void destroy_stack(Stack hStack) {
 
 
 //push an item onto the stack
-void stack_push(Stack *hStack, int data) {
+void stack_push(Stack *hStack, unsigned long long data) {
     STACK *pStack = (STACK *)hStack; 
 
     StackItem *new_item = (StackItem *)malloc(sizeof(StackItem));  //create our new stack item
@@ -57,7 +56,7 @@ void stack_push(Stack *hStack, int data) {
     pStack->top = new_item; //make our new item the top of the stack pointing downwards at the former first item
 }
 
-void stack_pop(Stack *hStack, int *data) { 
+void stack_pop(Stack *hStack, unsigned long long *data) { 
     STACK *pStack = (STACK *)hStack; 
     StackItem *pTopItem = pStack->top;               //get the item on top of the stack
 
@@ -66,7 +65,8 @@ void stack_pop(Stack *hStack, int *data) {
     }
 
     pStack->top = pTopItem->below;        //make our top item the one below
-    *data = pTopItem->data;               //get the data of the former top item
+    if (data != NULL)
+        *data = pTopItem->data;               //get the data of the former top item
 
     free(pTopItem);                  //free the top item, the user does not have access to StackItem so we free to avoid a memory leak
 }
