@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "stack.h"
+#include "heap_store.h"
 
 unsigned char tape[30000] = { 0 };
 
@@ -33,6 +34,16 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    PROGRAM program = create_program();
+    
+    //clean sanitize and prog
+    while ((c = fgetc(input_txt)) != EOF) {
+        proc = convert(c);
+        if (proc >= 0 && proc <= 7)
+            add_c(program, c);
+    }
+
+    rewind_program(program);
 
     
 
@@ -65,6 +76,7 @@ int main(int argc, char *argv[]) {
 
     fclose(input_txt);
     destroy_stack(stack);
+    destroy_program(&program);
     return 0;
 }
 
