@@ -1,2 +1,7 @@
 .vscode/
-main
+compile.asm
+interpreter
+compiler
+compiler.o
+compile
+compile.o
