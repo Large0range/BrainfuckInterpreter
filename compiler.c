@@ -48,19 +48,32 @@ int main(int argc, char *argv[]) {
     rewind_program(program);
 
     FILE *asm_code = fopen("compile.asm", "w");
-    fprintf(asm_code, "default rel\nsection .bss\ntape resb 30000\n\nsection .text\nglobal _start\n_start:mov rsi, 0\n\n");
+    fprintf(asm_code, "default rel\nsection .bss\nbuf resb 1\ntape resb 30000\n\nsection .text\nglobal _start\n_start:mov rsi, 0\nlea rbx, [rel tape]\n\n");
     int index = 0, count;
     unsigned long long loc, tag_depth = 0, tag_pop;
     do {
         c = get_c(program);
         printf("%c", c);
 
+        if (c == '.') {
+            printf("printing here");
+            fprintf(asm_code, "push rsi\n");
+            fprintf(asm_code, "mov al, [rbx + rsi]\n");
+            fprintf(asm_code, "mov [buf], al\n");
+            fprintf(asm_code, "mov rax, 1\n");
+            fprintf(asm_code, "mov rdi, 1\n");
+            fprintf(asm_code, "mov rsi, buf\n");
+            fprintf(asm_code, "mov rdx, 1\n");
+            fprintf(asm_code, "syscall\n");
+            fprintf(asm_code, "pop rsi\n");
+        }
+
         if (c == '[') {
             tag_depth++;
             stack_push(stack, tag_depth);
 
-            fprintf(asm_code, "mov rax, [tape + rsi]\n");
-            fprintf(asm_code, "cmp rax, 0\n");
+            fprintf(asm_code, "mov al, [rbx + rsi]\n");
+            fprintf(asm_code, "cmp al, 0\n");
             fprintf(asm_code, "je out_tag%llu\n", tag_depth);
             fprintf(asm_code, "in_tag%llu:\n", tag_depth);
             continue;
@@ -70,8 +83,8 @@ int main(int argc, char *argv[]) {
         if (c == ']') {
             stack_pop(stack, &tag_pop);
 
-            fprintf(asm_code, "mov rax, [tape + rsi]\n");
-            fprintf(asm_code, "cmp rax, 0\n");
+            fprintf(asm_code, "mov al, [rbx + rsi]\n");
+            fprintf(asm_code, "cmp al, 0\n");
             fprintf(asm_code, "jne in_tag%llu\n", tag_pop);
             fprintf(asm_code, "out_tag%llu:\n", tag_pop);
             continue;
@@ -125,9 +138,9 @@ int main(int argc, char *argv[]) {
 
             decrement_program(program);
 
-            fprintf(asm_code, "mov rax, [tape + rsi]\n");
-            fprintf(asm_code, "add rax, %d\n", count);
-            fprintf(asm_code, "mov [tape + rsi], rax\n");
+            fprintf(asm_code, "mov al, [rbx + rsi]\n");
+            fprintf(asm_code, "add al, %d\n", count);
+            fprintf(asm_code, "mov [rbx + rsi], al\n");
             continue;
         }
 
@@ -143,9 +156,9 @@ int main(int argc, char *argv[]) {
 
             decrement_program(program);
 
-            fprintf(asm_code, "mov rax, [tape + rsi]\n");
-            fprintf(asm_code, "sub rax, %d\n", count);
-            fprintf(asm_code, "mov [tape + rsi], rax\n");
+            fprintf(asm_code, "mov al, [rbx + rsi]\n");
+            fprintf(asm_code, "sub al, %d\n", count);
+            fprintf(asm_code, "mov [rbx + rsi], al\n");
             continue;
         }
     } while (advance_program(program));
