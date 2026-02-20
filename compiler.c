@@ -7,11 +7,10 @@ int convert(int c);
 int main(int argc, char *argv[]) {
     if (argc == 1) {printf("Bro you gotta pass an input file\n"); return -1;}
 
-    int c, proc;
 
     Stack stack = create_stack();
 
-
+    int c, proc;
     
 
     FILE *input_txt = fopen(argv[1], "r");
@@ -50,33 +49,32 @@ int main(int argc, char *argv[]) {
 
     FILE *asm_code = fopen("compile.asm", "w");
     fprintf(asm_code, "default rel\nsection .bss\ntape resb 30000\n\nsection .text\nglobal _start\n_start:\n");
-    int index = 0, count, tag_depth = 0;
-    unsigned long long loc;
-    unsigned long long tag_pop = 0;
+    int index = 0, count;
+    unsigned long long loc, tag_depth = 0, tag_pop;
     do {
         c = get_c(program);
-        printf("%c", c);
 
         if (c == '[') {
             tag_depth++;
-
-//            stack_push(stack, tag_depth);
+            stack_push(stack, tag_depth);
 
             fprintf(asm_code, "mov rax, [tape + %d]\n", index);
             fprintf(asm_code, "cmp rax, 0\n");
-            fprintf(asm_code, "je out_tag%d\n", tag_depth);
-            fprintf(asm_code, "in_tag%d:\n", tag_depth);
+            fprintf(asm_code, "je out_tag%llu\n", tag_depth);
+            fprintf(asm_code, "in_tag%llu:\n", tag_depth);
+
         }
 
-
         if (c == ']') {
-            //stack_pop(stack, &tag_pop);
+            stack_pop(stack, &tag_pop);
 
             fprintf(asm_code, "mov rax, [tape + %d]\n", index);
             fprintf(asm_code, "cmp rax, 0\n");
             fprintf(asm_code, "jne in_tag%llu\n", tag_pop);
             fprintf(asm_code, "out_tag%llu:\n", tag_pop);
         }
+
+
 
         if (c == '>') {
             count = 1;
@@ -156,8 +154,8 @@ int main(int argc, char *argv[]) {
 
     fprintf(asm_code, "\nmov rax, 60\nmov rdi, 0\nsyscall\n");
 
-    destroy_program(&program);
     destroy_stack(&stack);
+    destroy_program(&program);
     fclose(asm_code);
     return 0;
 }

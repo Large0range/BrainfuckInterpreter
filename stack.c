@@ -32,11 +32,11 @@ Stack create_stack() {
 void destroy_stack(Stack *hStack) {
     unsigned long long a; //throw away variable to store the popping
 
-    while (!is_stack_empty(hStack)) {
-        stack_pop(hStack, &a);
+    while (!is_stack_empty(*hStack)) {
+        stack_pop(*hStack, &a);
     }
 
-    free(hStack); // free the stack at the end
+    free(*hStack); // free the stack at the end
     *hStack = NULL;
 }
 
