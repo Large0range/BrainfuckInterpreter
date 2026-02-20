@@ -9,11 +9,11 @@ void destroy_program(PROGRAM *);
 void add_c(PROGRAM, char);
 char get_c(PROGRAM);
 
-void advance_program(PROGRAM);
+int advance_program(PROGRAM);
 void decrement_program(PROGRAM);
 void rewind_program(PROGRAM);
 
-void seek_program_location(PROGRAM, void *);
-void *get_program_location(PROGRAM);
+void seek_program_location(PROGRAM, unsigned long long);
+unsigned long long get_program_location(PROGRAM);
 
 #endif 

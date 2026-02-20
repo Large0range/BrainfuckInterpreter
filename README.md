@@ -14,3 +14,6 @@ The tape has a standard size of 30,000 cells with no bounds checking. The progra
 
 Potential Implementations:
 Simple decompression and interpreter things that will speed up the program. Instead of incrementing at each +, simply count them and increment by that amount. Rewrite it into C code and then into machine code for quicker processing. Resizing the heap and storing the program in memory for faster access.
+
+Finished:
+Stores the program into memory in a resizing opaque object that will double in size each time it needs to. Takes up a larger amount of memory but is much faster than accessing the length and making it exact.

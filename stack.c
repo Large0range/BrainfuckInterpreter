@@ -29,7 +29,7 @@ Stack create_stack() {
     return pStack; 
 }
 
-void destroy_stack(Stack hStack) {
+void destroy_stack(Stack *hStack) {
     unsigned long long a; //throw away variable to store the popping
 
     while (!is_stack_empty(hStack)) {
@@ -37,11 +37,12 @@ void destroy_stack(Stack hStack) {
     }
 
     free(hStack); // free the stack at the end
+    *hStack = NULL;
 }
 
 
 //push an item onto the stack
-void stack_push(Stack *hStack, unsigned long long data) {
+void stack_push(Stack hStack, unsigned long long data) {
     STACK *pStack = (STACK *)hStack; 
 
     StackItem *new_item = (StackItem *)malloc(sizeof(StackItem));  //create our new stack item
@@ -52,11 +53,11 @@ void stack_push(Stack *hStack, unsigned long long data) {
 
     new_item->below = pStack->top;  //point our top item to the top item in the stack
     new_item->data = data; 
-
+    
     pStack->top = new_item; //make our new item the top of the stack pointing downwards at the former first item
 }
 
-void stack_pop(Stack *hStack, unsigned long long *data) { 
+void stack_pop(Stack hStack, unsigned long long *data) { 
     STACK *pStack = (STACK *)hStack; 
     StackItem *pTopItem = pStack->top;               //get the item on top of the stack
 
@@ -71,13 +72,13 @@ void stack_pop(Stack *hStack, unsigned long long *data) {
     free(pTopItem);                  //free the top item, the user does not have access to StackItem so we free to avoid a memory leak
 }
 
-int stack_top(Stack *hStack) {
+int stack_top(Stack hStack) {
     STACK *pStack = (STACK *)hStack;
     
     return pStack->top->data;           //return the data of the top item
 }
 
-int is_stack_empty(Stack *hStack) {
+int is_stack_empty(Stack hStack) {
     STACK *pStack = (STACK *)hStack;
 
     return (pStack->top == NULL);        //check if there is a top item

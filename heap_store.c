@@ -4,7 +4,8 @@
 
 struct program {
     char *prog;
-    char *prog_pointer;
+    unsigned long long offset;
+
     unsigned long long capacity;
     unsigned long long size;
 };
@@ -15,9 +16,8 @@ PROGRAM create_program() {
     Program* p = (Program *)malloc(sizeof(Program));
     if (p != NULL) {
         p->prog = (char *)malloc(1);
-        p->prog_pointer = p->prog;
+        p->offset = 0;
         p->capacity = 1;
-        p->size = 0;
     }
 
     return p;
@@ -46,47 +46,53 @@ void add_c(PROGRAM hProgram, char c) {
             program->prog[i] = old_data[i];
         }
 
+
+        program->size = program->capacity;
         program->capacity *= 2;
-        program->prog_pointer = program->prog + program->size;
 
         free(old_data);
     }
 
-    *(program->prog_pointer) = c;
-    program->prog_pointer++;
+    program->prog[program->size] = c;
     program->size++;
 }
 
 char get_c(PROGRAM hProgram) {
     Program *program = (Program *)hProgram;
 
-    return *(program->prog_pointer);
+    return program->prog[program->offset];
 }
 
-void advance_program(PROGRAM hProgram) {
+int advance_program(PROGRAM hProgram) {
     Program *program = (Program *)hProgram;
-    program->prog_pointer++;
+    if (program->offset + 1 < program->capacity) {
+        program->offset++;
+        //printf("%llu %llu\n", program->offset, program->capacity);
+        return 1;
+    }
+
+    return 0;
 }
 
 void decrement_program(PROGRAM hProgram) {
     Program *program = (Program *)hProgram;
-    program->prog_pointer--;
+    program->offset--;
 }
 
 void rewind_program(PROGRAM hProgram) {
     Program *program = (Program *)hProgram;
 
-    program->prog_pointer = program->prog;
+    program->offset = 0;
 }
 
-void seek_program_location(PROGRAM hProgram, void *location) {
+void seek_program_location(PROGRAM hProgram, unsigned long long location) {
     Program *program = (Program *)hProgram;
 
-    program->prog_pointer = location;
+    program->offset = location;
 }
 
-void *get_program_location(PROGRAM hProgram) {
+unsigned long long get_program_location(PROGRAM hProgram) {
     Program *program = (Program *)hProgram;
 
-    return program->prog_pointer;
+    return program->offset;
 }
