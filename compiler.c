@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     rewind_program(program);
 
     FILE *asm_code = fopen("compile.asm", "w");
-    fprintf(asm_code, "default rel\nsection .bss\ntape resb 30000\n\nsection .text\nglobal _start\n_start:\n");
+    fprintf(asm_code, "default rel\nsection .bss\ntape resb 30000\n\nsection .text\nglobal _start\n_start:mov rsi, 0\n\n");
     int index = 0, count;
     unsigned long long loc, tag_depth = 0, tag_pop;
     do {
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
             tag_depth++;
             stack_push(stack, tag_depth);
 
-            fprintf(asm_code, "mov rax, [tape + %d]\n", index);
+            fprintf(asm_code, "mov rax, [tape + rsi]\n");
             fprintf(asm_code, "cmp rax, 0\n");
             fprintf(asm_code, "je out_tag%llu\n", tag_depth);
             fprintf(asm_code, "in_tag%llu:\n", tag_depth);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
         if (c == ']') {
             stack_pop(stack, &tag_pop);
 
-            fprintf(asm_code, "mov rax, [tape + %d]\n", index);
+            fprintf(asm_code, "mov rax, [tape + rsi]\n");
             fprintf(asm_code, "cmp rax, 0\n");
             fprintf(asm_code, "jne in_tag%llu\n", tag_pop);
             fprintf(asm_code, "out_tag%llu:\n", tag_pop);
@@ -92,6 +92,7 @@ int main(int argc, char *argv[]) {
             decrement_program(program);
 
             index += count;
+            fprintf(asm_code, "add rsi, %d\n", count);
             continue;
         }
 
@@ -108,6 +109,7 @@ int main(int argc, char *argv[]) {
             decrement_program(program);
 
             index -= count;
+            fprintf(asm_code, "sub rsi, %d\n", count);
             continue;
         }
         
@@ -123,9 +125,9 @@ int main(int argc, char *argv[]) {
 
             decrement_program(program);
 
-            fprintf(asm_code, "mov rax, [tape + %d]\n", index);
+            fprintf(asm_code, "mov rax, [tape + rsi]\n");
             fprintf(asm_code, "add rax, %d\n", count);
-            fprintf(asm_code, "mov [tape + %d], rax\n", index);
+            fprintf(asm_code, "mov [tape + rsi], rax\n");
             continue;
         }
 
@@ -141,9 +143,9 @@ int main(int argc, char *argv[]) {
 
             decrement_program(program);
 
-            fprintf(asm_code, "mov rax, [tape + %d]\n", index);
+            fprintf(asm_code, "mov rax, [tape + rsi]\n");
             fprintf(asm_code, "sub rax, %d\n", count);
-            fprintf(asm_code, "mov [tape + %d], rax\n", index);
+            fprintf(asm_code, "mov [tape + rsi], rax\n");
             continue;
         }
     } while (advance_program(program));
