@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
     unsigned long long loc, tag_depth = 0, tag_pop;
     do {
         c = get_c(program);
+        printf("%c", c);
 
         if (c == '[') {
             tag_depth++;
@@ -62,6 +63,7 @@ int main(int argc, char *argv[]) {
             fprintf(asm_code, "cmp rax, 0\n");
             fprintf(asm_code, "je out_tag%llu\n", tag_depth);
             fprintf(asm_code, "in_tag%llu:\n", tag_depth);
+            continue;
 
         }
 
@@ -72,6 +74,7 @@ int main(int argc, char *argv[]) {
             fprintf(asm_code, "cmp rax, 0\n");
             fprintf(asm_code, "jne in_tag%llu\n", tag_pop);
             fprintf(asm_code, "out_tag%llu:\n", tag_pop);
+            continue;
         }
 
 
@@ -89,6 +92,7 @@ int main(int argc, char *argv[]) {
             decrement_program(program);
 
             index += count;
+            continue;
         }
 
         if (c == '<') {
@@ -104,6 +108,7 @@ int main(int argc, char *argv[]) {
             decrement_program(program);
 
             index -= count;
+            continue;
         }
         
         if (c == '+') {
@@ -121,6 +126,7 @@ int main(int argc, char *argv[]) {
             fprintf(asm_code, "mov rax, [tape + %d]\n", index);
             fprintf(asm_code, "add rax, %d\n", count);
             fprintf(asm_code, "mov [tape + %d], rax\n", index);
+            continue;
         }
 
         if (c == '-') {
@@ -138,6 +144,7 @@ int main(int argc, char *argv[]) {
             fprintf(asm_code, "mov rax, [tape + %d]\n", index);
             fprintf(asm_code, "sub rax, %d\n", count);
             fprintf(asm_code, "mov [tape + %d], rax\n", index);
+            continue;
         }
     } while (advance_program(program));
     
