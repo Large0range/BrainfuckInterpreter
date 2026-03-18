@@ -53,10 +53,8 @@ int main(int argc, char *argv[]) {
     unsigned long long loc, tag_depth = 0, tag_pop;
     do {
         c = get_c(program);
-        printf("%c", c);
 
         if (c == '.') {
-            printf("printing here");
             fprintf(asm_code, "push rsi\n");
             fprintf(asm_code, "mov al, [rbx + rsi]\n");
             fprintf(asm_code, "mov [buf], al\n");
