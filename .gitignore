@@ -5,3 +5,7 @@ compiler
 compiler.o
 compile
 compile.o
+
+# Added by cargo
+
+/target
