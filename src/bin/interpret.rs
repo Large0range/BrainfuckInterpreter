@@ -56,4 +56,17 @@ fn main() {
 
         program_location += 1;
     } 
+
+    /*
+    for x in tokens {
+        match x {
+            '>' => {index = (index + 1) % tape.len();}
+            '<' => {index = (index  + tape.len() - 1) % tape.len();}
+            '+' => {tape[index] = tape[index].wrapping_add(1);}
+            '-' => {tape[index] = tape[index].wrapping_sub(1)}
+            '.' => {print_tape(&tape);}
+            '[' => {}
+            _ => {println!("{x} is not period");}
+        }
+    } */
 }
